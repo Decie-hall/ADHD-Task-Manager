@@ -1,0 +1,1114 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskNest | ADHD Task Manager</title>
+
+<style>
+/* ---------- GENERAL DESIGN ---------- */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #f8f4ff 0%, #f2f5ff 100%);
+    color: #2d2443;
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 25px;
+}
+
+button, input, select, textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-weight: 700;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    min-height: 44px;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+.primary {
+    background: #7d5ae0;
+    color: white;
+}
+
+.primary:hover {
+    background: #6d4fd2;
+}
+
+.secondary {
+    background: #efe8ff;
+    color: #4e3a8a;
+}
+
+.danger {
+    background: #ffe8ed;
+    color: #b43e55;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d8cef6;
+    border-radius: 12px;
+    background: white;
+    margin-top: 7px;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+input:focus, select:focus, textarea:focus, button:focus {
+    outline: 3px solid rgba(125, 90, 224, 0.22);
+    outline-offset: 2px;
+}
+
+h1, h2, h3 {
+    margin-top: 0;
+    line-height: 1.2;
+}
+
+.small-text {
+    color: #5e5873;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 8px 24px rgba(71, 59, 97, 0.08);
+    border: 1px solid rgba(125, 90, 224, 0.08);
+}
+
+/* ---------- HEADER ---------- */
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #7259c8;
+}
+
+.logo span {
+    color: #b39be9;
+}
+
+/* ---------- LOGIN ---------- */
+
+#dashboard {
+    display: none;
+}
+
+.login {
+    max-width: 430px;
+    margin: 70px auto;
+    text-align: center;
+}
+
+/* ---------- DASHBOARD ---------- */
+
+.welcome {
+    margin-bottom: 25px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.stat-number {
+    font-size: 30px;
+    font-weight: bold;
+    color: #7259c8;
+    margin-top: 8px;
+}
+
+.progress-background {
+    background: #e9e3f5;
+    height: 12px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 12px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #8067d8;
+    transition: width 0.3s;
+}
+
+/* ---------- MAIN LAYOUT ---------- */
+
+.columns {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 18px;
+    align-items: start;
+}
+
+/* ---------- TASKS ---------- */
+
+.task {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border: 1px solid #eeeaf5;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+}
+
+.task-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-name {
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.completed .task-name {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.task-details {
+    font-size: 12px;
+    color: #888196;
+    margin-top: 8px;
+    line-height: 1.6;
+}
+
+.task input[type="checkbox"] {
+    width: 20px;
+    margin: 2px 0;
+}
+
+.task-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.task-actions button {
+    padding: 7px;
+    background: #f3f0fa;
+}
+
+.difficulty {
+    display: inline-block;
+    border-radius: 20px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.easy {
+    background: #e0f5e9;
+    color: #26794b;
+}
+
+.medium {
+    background: #fff0d5;
+    color: #a66c15;
+}
+
+.hard {
+    background: #ffe4e8;
+    color: #b43e55;
+}
+
+.empty {
+    text-align: center;
+    padding: 30px 10px;
+    color: #888196;
+}
+
+/* ---------- FOCUS MODE ---------- */
+
+#focusArea {
+    display: none;
+    text-align: center;
+    background: linear-gradient(180deg, #f1ebff 0%, #ece7ff 100%);
+    padding: 28px 20px;
+    border-radius: 18px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(125, 90, 224, 0.12);
+}
+
+.focus-task {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 20px 0;
+    overflow-wrap: anywhere;
+    color: #2f2148;
+}
+
+.toolbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+/* ---------- BRAIN DUMP ---------- */
+
+#brainDump {
+    min-height: 130px;
+    resize: vertical;
+}
+
+/* ---------- MOBILE DESIGN ---------- */
+
+@media (max-width: 750px) {
+    .columns {
+        grid-template-columns: 1fr;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .container {
+        padding: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+    <div class="logo">✦ Task<span>Nest</span></div>
+    <div class="small-text">One thing at a time.</div>
+</header>
+
+<!-- LOGIN SCREEN -->
+
+<section class="card login" id="loginScreen">
+
+    <h1>Welcome to TaskNest! 💜</h1>
+
+    <p class="small-text">
+        A calmer place to organize your thoughts,
+        tasks, and everyday life.
+    </p>
+
+    <form id="loginForm">
+
+        <label for="username">Your username</label>
+
+        <input
+            type="text"
+            id="username"
+            placeholder="Enter your username"
+            maxlength="30"
+            required
+        >
+
+        <button class="primary" type="submit">
+            Open My Task List →
+        </button>
+
+    </form>
+
+    <p class="small-text">
+        Your tasks are saved in this browser.
+    </p>
+
+</section>
+
+<!-- MAIN DASHBOARD -->
+
+<main id="dashboard">
+
+    <section class="welcome">
+
+        <h1 id="welcomeMessage">Hello!</h1>
+
+        <p class="small-text" id="dateMessage"></p>
+
+        <div class="toolbar-actions">
+            <button class="primary" id="startFocusButton">
+                Start Focus Session
+            </button>
+
+            <button class="secondary" id="logoutButton">
+                Switch Profile
+            </button>
+        </div>
+
+    </section>
+
+    <!-- PROGRESS -->
+
+    <section class="stats">
+
+        <div class="card">
+            <div class="small-text">TOTAL TASKS</div>
+            <div class="stat-number" id="totalTasks">0</div>
+        </div>
+
+        <div class="card">
+            <div class="small-text">COMPLETED</div>
+            <div class="stat-number" id="completedTasks">0</div>
+        </div>
+
+        <div class="card">
+            <div class="small-text">LEFT TO DO</div>
+            <div class="stat-number" id="remainingTasks">0</div>
+        </div>
+
+    </section>
+
+    <section class="card">
+
+        <h3>Today's progress 🌱</h3>
+
+        <div class="progress-background">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <p class="small-text" id="progressText">
+            Every little step counts!
+        </p>
+
+    </section>
+
+    <!-- FOCUS MODE -->
+
+    <section id="focusArea">
+
+        <h3>🎯 Focus Mode</h3>
+
+        <p class="small-text">
+            Just focus on this one task for now.
+        </p>
+
+        <div class="focus-task" id="focusTaskName"></div>
+
+        <button class="primary" id="finishFocus">
+            Mark as Completed ✓
+        </button>
+
+        <button class="secondary" id="nextFocus">
+            Another Task
+        </button>
+
+        <button class="danger" id="closeFocus">
+            Exit Focus Mode
+        </button>
+
+    </section>
+
+    <section class="columns">
+
+        <!-- ADD TASK -->
+
+        <div>
+
+            <div class="card">
+
+                <h3>＋ Add a Task</h3>
+
+                <form id="taskForm">
+
+                    <label for="taskName">What do you need to do?</label>
+
+                    <input
+                        type="text"
+                        id="taskName"
+                        placeholder="Example: Finish Python homework"
+                        maxlength="120"
+                        required
+                    >
+
+                    <label for="difficulty">Difficulty level</label>
+
+                    <select id="difficulty">
+                        <option value="Easy">Easy</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Hard">Hard</option>
+                    </select>
+
+                    <button class="primary" type="submit">
+                        Add Task +
+                    </button>
+
+                </form>
+
+                <p class="small-text">
+                    You don't have to finish everything today.
+                    Start with one small thing.
+                </p>
+
+            </div>
+
+            <!-- BRAIN DUMP -->
+
+            <div class="card">
+
+                <h3>🧠 Brain Dump</h3>
+
+                <p class="small-text">
+                    Random thoughts? Write them down here.
+                </p>
+
+                <textarea
+                    id="brainDump"
+                    placeholder="Things I need to remember..."
+                ></textarea>
+
+                <button class="primary" id="saveBrainDump">
+                    Save Thoughts
+                </button>
+
+            </div>
+
+            <div class="card">
+
+                <h3>✨ Need a reset?</h3>
+
+                <p class="small-text">
+                    Take a short break, get some water,
+                    stretch, and come back when you're ready.
+                </p>
+
+                <button class="secondary" id="breakButton">
+                    Take a Break
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- TASK LIST -->
+
+        <div class="card">
+
+            <h3>My Tasks 📋</h3>
+
+            <input
+                type="text"
+                id="searchTasks"
+                placeholder="Search tasks..."
+            >
+
+            <select id="filterTasks">
+                <option value="All">All Tasks</option>
+                <option value="Awaiting Completion">To Do</option>
+                <option value="Completed">Completed</option>
+            </select>
+
+            <div id="taskList"></div>
+
+        </div>
+
+    </section>
+
+</main>
+
+</div>
+
+<script>
+
+/* =================================
+   USER DATA
+================================= */
+
+const STORAGE_KEY = "tasknest_users";
+
+let users = {};
+
+let currentUser = "";
+
+let focusIndex = -1;
+
+
+// Load saved users from browser storage.
+
+function loadUsers() {
+
+    try {
+
+        users = JSON.parse(
+            localStorage.getItem(STORAGE_KEY)
+        ) || {};
+
+    } catch (error) {
+
+        users = {};
+
+    }
+
+}
+
+
+// Save all users and tasks.
+
+function saveUsers() {
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(users)
+    );
+
+}
+
+
+// Get today's date.
+
+function getDate() {
+
+    return new Date().toLocaleDateString();
+
+}
+
+
+/* =================================
+   LOGIN SYSTEM
+================================= */
+
+document.getElementById("loginForm")
+.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    let username = document.getElementById("username")
+    .value.trim();
+
+    if (username === "") {
+        return;
+    }
+
+    let key = username.toLowerCase();
+
+    if (!users[key]) {
+
+        users[key] = {
+            displayName: username,
+            tasks: [],
+            brainDump: ""
+        };
+
+    }
+
+    // Add missing data if opening an older profile.
+
+    if (!users[key].brainDump) {
+        users[key].brainDump = "";
+    }
+
+    currentUser = key;
+
+    saveUsers();
+
+    document.getElementById("loginScreen").style.display = "none";
+
+    document.getElementById("dashboard").style.display = "block";
+
+    document.getElementById("welcomeMessage").textContent =
+    "Hello, " + users[key].displayName + "! 💜";
+
+    document.getElementById("dateMessage").textContent =
+    "Today is " + getDate() + ". Let's take it one step at a time.";
+
+    document.getElementById("brainDump").value =
+    users[key].brainDump;
+
+    renderTasks();
+
+});
+
+
+// Switch profiles.
+
+document.getElementById("logoutButton")
+.addEventListener("click", function() {
+
+    currentUser = "";
+
+    document.getElementById("dashboard").style.display = "none";
+
+    document.getElementById("loginScreen").style.display = "block";
+
+    document.getElementById("username").value = "";
+
+});
+
+document.getElementById("startFocusButton")
+.addEventListener("click", function() {
+
+    if (!currentUser) {
+        return;
+    }
+
+    openFocusMode();
+
+});
+
+
+/* =================================
+   ADD TASKS
+================================= */
+
+document.getElementById("taskForm")
+.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    let name = document.getElementById("taskName").value.trim();
+
+    let difficulty = document.getElementById("difficulty").value;
+
+    if (name === "") {
+        return;
+    }
+
+    let task = {
+
+        task_name: name,
+
+        creation_date: getDate(),
+
+        completion_date: "Not completed",
+
+        difficulty_level: difficulty,
+
+        status: "Awaiting Completion"
+
+    };
+
+    users[currentUser].tasks.push(task);
+
+    saveUsers();
+
+    document.getElementById("taskName").value = "";
+
+    renderTasks();
+
+});
+
+
+/* =================================
+   COMPLETE TASKS
+================================= */
+
+function completeTask(index) {
+
+    let task = users[currentUser].tasks[index];
+
+    if (task.status === "Completed") {
+
+        task.status = "Awaiting Completion";
+
+        task.completion_date = "Not completed";
+
+    } else {
+
+        task.status = "Completed";
+
+        task.completion_date = getDate();
+
+    }
+
+    saveUsers();
+
+    renderTasks();
+
+}
+
+
+/* =================================
+   DELETE TASKS
+================================= */
+
+function deleteTask(index) {
+
+    let answer = confirm("Are you sure you want to delete this task?");
+
+    if (answer) {
+
+        users[currentUser].tasks.splice(index, 1);
+
+        saveUsers();
+
+        renderTasks();
+
+    }
+
+}
+
+
+/* =================================
+   DISPLAY TASKS
+================================= */
+
+function renderTasks() {
+
+    if (!currentUser) {
+        return;
+    }
+
+    let tasks = users[currentUser].tasks;
+
+    let completed = 0;
+
+    for (let i = 0; i < tasks.length; i++) {
+
+        if (tasks[i].status === "Completed") {
+
+            completed++;
+
+        }
+
+    }
+
+    let remaining = tasks.length - completed;
+
+    document.getElementById("totalTasks").textContent =
+    tasks.length;
+
+    document.getElementById("completedTasks").textContent =
+    completed;
+
+    document.getElementById("remainingTasks").textContent =
+    remaining;
+
+    let percentage = 0;
+
+    if (tasks.length > 0) {
+
+        percentage = (completed / tasks.length) * 100;
+
+    }
+
+    document.getElementById("progressBar").style.width =
+    percentage + "%";
+
+    document.getElementById("progressText").textContent =
+    completed + " out of " + tasks.length +
+    " tasks completed. Every little step counts!";
+
+    let list = document.getElementById("taskList");
+
+    list.innerHTML = "";
+
+    let search = document.getElementById("searchTasks")
+    .value.toLowerCase();
+
+    let filter = document.getElementById("filterTasks").value;
+
+    let visibleIndexes = [];
+
+    for (let i = 0; i < tasks.length; i++) {
+
+        let task = tasks[i];
+
+        let matchesSearch = task.task_name.toLowerCase()
+        .includes(search);
+
+        let matchesFilter = filter === "All" ||
+        task.status === filter;
+
+        if (matchesSearch && matchesFilter) {
+            visibleIndexes.push(i);
+        }
+
+    }
+
+    visibleIndexes.sort((a, b) => {
+        let aPriority = tasks[a].status === "Awaiting Completion" ? 0 : 1;
+        let bPriority = tasks[b].status === "Awaiting Completion" ? 0 : 1;
+
+        if (aPriority !== bPriority) {
+            return aPriority - bPriority;
+        }
+
+        return 0;
+    });
+
+    let found = 0;
+
+    for (let index of visibleIndexes) {
+
+        let task = tasks[index];
+
+        found++;
+
+        let card = document.createElement("div");
+
+        card.className = "task";
+
+        if (task.status === "Completed") {
+
+            card.classList.add("completed");
+
+        }
+
+        let checkbox = document.createElement("input");
+
+        checkbox.type = "checkbox";
+
+        checkbox.checked = task.status === "Completed";
+
+        checkbox.addEventListener("change", function() {
+
+            completeTask(index);
+
+        });
+
+        let info = document.createElement("div");
+
+        info.className = "task-info";
+
+        let name = document.createElement("div");
+
+        name.className = "task-name";
+
+        name.textContent = task.task_name;
+
+        let details = document.createElement("div");
+
+        details.className = "task-details";
+
+        details.textContent =
+        "Difficulty: " + task.difficulty_level +
+        " | Status: " + task.status +
+        " | Created: " + task.creation_date +
+        " | Completed: " + task.completion_date;
+
+        info.appendChild(name);
+
+        info.appendChild(details);
+
+        let actions = document.createElement("div");
+
+        actions.className = "task-actions";
+
+        let remove = document.createElement("button");
+
+        remove.textContent = "✕";
+
+        remove.setAttribute("aria-label", "Delete task");
+
+        remove.addEventListener("click", function() {
+
+            deleteTask(index);
+
+        });
+
+        actions.appendChild(remove);
+
+        card.appendChild(checkbox);
+
+        card.appendChild(info);
+
+        card.appendChild(actions);
+
+        list.appendChild(card);
+
+    }
+
+    if (found === 0) {
+
+        let empty = document.createElement("div");
+
+        empty.className = "empty";
+
+        empty.textContent = tasks.length === 0
+        ? "🌱 No tasks yet. Add your first one!"
+        : "No matching tasks found.";
+
+        list.appendChild(empty);
+
+    }
+
+}
+
+
+/* =================================
+   FOCUS MODE
+================================= */
+
+function openFocusMode() {
+
+    let tasks = users[currentUser].tasks;
+
+    focusIndex = -1;
+
+    for (let i = 0; i < tasks.length; i++) {
+
+        if (tasks[i].status === "Awaiting Completion") {
+
+            focusIndex = i;
+
+            break;
+
+        }
+
+    }
+
+    showFocusTask();
+
+}
+
+
+function showFocusTask() {
+
+    let tasks = users[currentUser].tasks;
+
+    let focusArea = document.getElementById("focusArea");
+
+    focusArea.style.display = "block";
+
+    if (focusIndex === -1 || focusIndex >= tasks.length) {
+
+        document.getElementById("focusTaskName").textContent =
+        "No unfinished tasks! Great job! 🎉";
+
+        return;
+
+    }
+
+    document.getElementById("focusTaskName").textContent =
+    tasks[focusIndex].task_name;
+
+}
+
+
+document.getElementById("finishFocus")
+.addEventListener("click", function() {
+
+    if (focusIndex !== -1) {
+
+        completeTask(focusIndex);
+
+        openFocusMode();
+
+    }
+
+});
+
+
+document.getElementById("nextFocus")
+.addEventListener("click", function() {
+
+    let tasks = users[currentUser].tasks;
+
+    for (let i = focusIndex + 1; i < tasks.length; i++) {
+
+        if (tasks[i].status === "Awaiting Completion") {
+
+            focusIndex = i;
+
+            showFocusTask();
+
+            return;
+
+        }
+
+    }
+
+    focusIndex = -1;
+
+    showFocusTask();
+
+});
+
+
+document.getElementById("closeFocus")
+.addEventListener("click", function() {
+
+    document.getElementById("focusArea").style.display = "none";
+
+});
+
+
+/* =================================
+   BRAIN DUMP
+================================= */
+
+document.getElementById("saveBrainDump")
+.addEventListener("click", function() {
+
+    users[currentUser].brainDump =
+    document.getElementById("brainDump").value;
+
+    saveUsers();
+
+    alert("Your thoughts have been saved! 💜");
+
+});
+
+
+/* =================================
+   BREAK BUTTON
+================================= */
+
+document.getElementById("breakButton")
+.addEventListener("click", function() {
+
+    alert("Take a little break! Get some water, stretch, and relax. You can come back when you're ready. 💜");
+
+});
+
+
+/* =================================
+   SEARCH AND FILTERS
+================================= */
+
+document.getElementById("searchTasks")
+.addEventListener("input", renderTasks);
+
+document.getElementById("filterTasks")
+.addEventListener("change", renderTasks);
+
+
+/* =================================
+   START PROGRAM
+================================= */
+
+loadUsers();
+
+</script>
+
+</body>
+</html>
